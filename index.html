@@ -310,14 +310,6 @@
   <div class="hs hs-pad dd-row" id="ddRow"></div>
 </section>
 
-<section class="pick" aria-labelledby="pk-h">
-  <div class="wrap">
-    <p class="kicker">EDITOR'S PICK</p>
-    <h2 class="sec" id="pk-h">에디터가 먼저 고른 케이크</h2>
-  </div>
-  <div class="hs hs-pad pick-row" id="pickRow"></div>
-</section>
-
 <section id="find" aria-labelledby="fd-h">
   <div class="wrap">
     <h2 class="sec" id="fd-h">테마·브랜드로 찾기</h2>
@@ -357,10 +349,9 @@
 <section id="share" class="wrap" aria-labelledby="sh-h">
   <div class="cta">
     <h2 id="sh-h">같이 고를 사람에게<br>보내주세요</h2>
-    <p>신상 케이크와 마감 소식은 인스타그램과 카카오 채널에서 받아보세요.</p>
+    <p>신상 케이크와 마감 소식은 인스타그램에서 받아보세요.</p>
     <div class="cta-btns">
       <button class="btn primary" type="button" id="shareCta">링크 공유하기</button>
-      <a class="btn kakao" href="https://pf.kakao.com/_xctVxlxj" target="_blank" rel="noopener">카카오 채널 추가</a>
       <a class="btn" href="https://www.instagram.com/omuk.official/" target="_blank" rel="noopener">@omuk.official 팔로우</a>
     </div>
   </div>
@@ -369,9 +360,6 @@
 
 <footer class="wrap">
   <p class="f-logo">오늘뭐먹지<span>?</span></p>
-  <p>정보 확인일 2026년 11월 24일 · 사진과 가격은 각 브랜드 공식 홈페이지, 공식 인스타그램, 카카오 공식 브랜드관을 기준으로 정리했어요.</p>
-  <p>스타벅스 매장 홀케이크는 공식 홈페이지에 가격이 없어 언론 보도(스타벅스 발표) 기준이에요. 가격은 매장·채널별로 다를 수 있어요.</p>
-  <p>제품 사진의 저작권은 각 브랜드에 있어요. 케이크를 누르면 사진·가격 출처를 확인할 수 있어요.</p>
 </footer>
 
 <div class="sheet-bg" id="sheetBg" hidden></div>
@@ -892,7 +880,7 @@ document.addEventListener("keydown", e => {
   }
 });
 
-renderHero(); renderDeadlines(); renderPicks(); renderSorts(); renderChips(); render(); renderSchedule(); renderPriceTables();
+renderHero(); renderDeadlines(); renderSorts(); renderChips(); render(); renderSchedule(); renderPriceTables();
 /* 공유 링크(#cake-N)로 들어오면: 시트를 닫았을 때 페이지에 남도록 기본 상태를 먼저 깔고 연다 */
 const m = location.hash.match(/^#cake-(\d+)$/);
 if (m && CAKES[+m[1] - 1]){ history.replaceState(null, "", pageUrl()); openSheet(+m[1] - 1); }
