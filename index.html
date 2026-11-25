@@ -352,7 +352,7 @@
     <button class="tab" type="button" role="tab" id="tabP" aria-controls="prices" aria-selected="false" tabindex="-1">브랜드별 가격표</button>
   </div>
   <div class="panel" id="panelS" role="tabpanel" aria-labelledby="tabS">
-    <p class="sub">마감이 가까운 순서예요. 눌러서 예약 채널과 혜택을 확인하세요. 혜택은 채널과 시기에 따라 달라질 수 있어요.</p>
+    <p class="sub">눌러서 예약 채널과 혜택을 확인하세요. 혜택은 채널과 시기에 따라 달라질 수 있어요.</p>
     <div class="sched" id="sched"></div>
   </div>
   <div class="panel" id="prices" role="tabpanel" aria-labelledby="tabP" hidden>
@@ -447,7 +447,9 @@ const brandOrder = Object.keys(BRANDS);
 /* 브랜드 버튼·드롭다운용: 가나다순, 호텔은 맨 뒤 (영문 이름은 한글 뒤) */
 const brandAbc = [...brandOrder].sort((a, b) =>
   (BRANDS[a].cat === "호텔") - (BRANDS[b].cat === "호텔") || /^[A-Za-z]/.test(a) - /^[A-Za-z]/.test(b) || a.localeCompare(b, "ko"));
-CAKES.forEach((c, i) => { c.i = i; c.no = i + 1; c.key = c.b + "|" + c.n; });
+CAKES.forEach((c, i) => { c.i = i; c.key = c.b + "|" + c.n; });
+/* No. 번호도 가나다 브랜드 순서대로 매김 */
+[...CAKES].sort((a, b) => (a.soldout ? 1 : 0) - (b.soldout ? 1 : 0) || brandAbc.indexOf(a.b) - brandAbc.indexOf(b.b) || a.i - b.i).forEach((c, k) => { c.no = k + 1; });
 const noLabel = c => "No." + String(c.no).padStart(2, "0");
 const PAGE = 12;
 const PICKS = [64, 74, 9, 30];
@@ -574,7 +576,7 @@ function filtered(){
     if (q && !(c.n + " " + c.d + " " + c.b + " " + c.tags.join(" ")).toLowerCase().includes(q)) return false;
     return true;
   });
-  const byBrand = (a, b) => brandOrder.indexOf(a.b) - brandOrder.indexOf(b.b) || a.i - b.i;
+  const byBrand = (a, b) => brandAbc.indexOf(a.b) - brandAbc.indexOf(b.b) || a.i - b.i;
   const so = (a, b) => (a.soldout ? 1 : 0) - (b.soldout ? 1 : 0); // 품절은 항상 맨 뒤
   if (st.sort === "asc") list.sort((a, b) => so(a, b) || a.price - b.price || byBrand(a, b));
   else if (st.sort === "desc") list.sort((a, b) => so(a, b) || b.price - a.price || byBrand(a, b));
@@ -637,7 +639,7 @@ function scrollToResults(){
 /* 예약 일정 */
 const chev = '<svg class="chev" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
 function renderSchedule(){
-  $("sched").innerHTML = brandsByDate().map(({ b, d }) => {
+  $("sched").innerHTML = brandAbc.map(b => ({ b, d: brandDue(b) })).filter(x => x.d).map(({ b, d }) => {
     const br = BRANDS[b];
     const n = CAKES.filter(c => c.b === b).length;
     return `<details>
@@ -660,7 +662,7 @@ function renderSchedule(){
 
 /* 가격표 */
 function renderPriceTables(){
-  $("ptables").innerHTML = brandOrder.map(name => {
+  $("ptables").innerHTML = brandAbc.map(name => {
     const list = CAKES.filter(c => c.b === name).slice().sort((a, b) => a.price - b.price);
     const lo = list[0].price, hi = list[list.length - 1].price;
     const rng = lo === hi ? won(lo) : `${won(lo)} ~ ${won(hi)}`;
