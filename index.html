@@ -82,6 +82,16 @@
   .dd-item small{display:block;font-size:12px;color:var(--on-green-muted)}
   .dd-item .go{display:block;margin-top:6px;font-size:12px;font-weight:700;color:var(--on-green)}
 
+  /* 브랜드 바로가기 버튼 */
+  .bq{padding-top:20px}
+  .bq-h{margin:0;font-size:17px;font-weight:900;letter-spacing:-.03em}
+  .bq-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .bq-btn{min-height:42px;display:inline-flex;align-items:center;padding:0 14px;border-radius:999px;border:1px solid var(--chip);background:var(--paper);color:var(--ink);font:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
+  .bq-btn small{margin-left:5px;font-size:12px;font-weight:500;color:var(--muted)}
+  .bq-btn[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+  .bq-btn[aria-pressed="true"] small{color:inherit;opacity:.8}
+  @media (hover:hover){ .bq-btn:hover{border-color:var(--ink)} }
+
   /* 공통 섹션 제목 */
   .kicker{margin:0;font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--red)}
   .sec{margin:2px 0 0;font-size:22px;font-weight:900;letter-spacing:-.04em}
@@ -310,6 +320,11 @@
   <div class="hs hs-pad dd-row" id="ddRow"></div>
 </section>
 
+<section class="wrap bq" aria-labelledby="bq-h">
+  <h2 class="bq-h" id="bq-h">브랜드별로 보기</h2>
+  <div class="bq-row" id="bqRow"></div>
+</section>
+
 <section id="find" aria-labelledby="fd-h">
   <div class="wrap">
     <h2 class="sec" id="fd-h">테마·브랜드로 찾기</h2>
@@ -493,6 +508,12 @@ function renderDeadlines(){
     </button>`).join("");
 }
 
+/* 브랜드 바로가기: 누르면 해당 브랜드 목록으로 */
+function renderBrandBtns(){
+  const btn = (v, label, n) => `<button class="bq-btn" type="button" data-jump="${esc(v)}" aria-pressed="false">${esc(label)}<small>${n}</small></button>`;
+  $("bqRow").innerHTML = btn("all", "전체", CAKES.length) + brandOrder.map(b => btn(b, b, CAKES.filter(c => c.b === b).length)).join("");
+}
+
 /* 가격 표기 */
 function priceHTML(c){
   if (c.pre) return `<span class="c-price"><span class="pct">${disc(c)}%</span><b>${won(c.pre)}</b><span class="lab">예약가</span></span><s class="c-orig">${won(c.price)}</s>`;
@@ -532,6 +553,7 @@ function renderChips(){
     `<option value="${esc(b)}">${esc(b)}${n ? ` (${CAKES.filter(c => c.b === b).length})` : ""}</option>`).join("");
   [["themeSel", 0], ["fsTheme", 1]].forEach(([id, n]) => { $(id).innerHTML = th(n); $(id).value = st.theme; $(id).classList.toggle("on", st.theme !== "all"); });
   [["brandSel", 0], ["fsBrand", 1]].forEach(([id, n]) => { $(id).innerHTML = br(n); $(id).value = st.brand; $(id).classList.toggle("on", st.brand !== "all"); });
+  document.querySelectorAll("#bqRow [data-jump]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.jump === st.brand)));
 }
 function renderSorts(){
   const SHORT = { brand: "기본순", pre: "예약가순", asc: "저가순", desc: "고가순", disc: "할인율순" };
@@ -880,7 +902,7 @@ document.addEventListener("keydown", e => {
   }
 });
 
-renderHero(); renderDeadlines(); renderSorts(); renderChips(); render(); renderSchedule(); renderPriceTables();
+renderHero(); renderDeadlines(); renderBrandBtns(); renderSorts(); renderChips(); render(); renderSchedule(); renderPriceTables();
 /* 공유 링크(#cake-N)로 들어오면: 시트를 닫았을 때 페이지에 남도록 기본 상태를 먼저 깔고 연다 */
 const m = location.hash.match(/^#cake-(\d+)$/);
 if (m && CAKES[+m[1] - 1]){ history.replaceState(null, "", pageUrl()); openSheet(+m[1] - 1); }
