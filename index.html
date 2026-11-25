@@ -444,6 +444,9 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":
 const disc = c => c.pre && c.price ? Math.round((1 - c.pre / c.price) * 100) : 0;
 const eff = c => c.pre || c.price;
 const brandOrder = Object.keys(BRANDS);
+/* 브랜드 버튼·드롭다운용: 가나다순, 호텔은 맨 뒤 (영문 이름은 한글 뒤) */
+const brandAbc = [...brandOrder].sort((a, b) =>
+  (BRANDS[a].cat === "호텔") - (BRANDS[b].cat === "호텔") || /^[A-Za-z]/.test(a) - /^[A-Za-z]/.test(b) || a.localeCompare(b, "ko"));
 CAKES.forEach((c, i) => { c.i = i; c.no = i + 1; c.key = c.b + "|" + c.n; });
 const noLabel = c => "No." + String(c.no).padStart(2, "0");
 const PAGE = 12;
@@ -511,7 +514,7 @@ function renderDeadlines(){
 /* 브랜드 바로가기: 누르면 해당 브랜드 목록으로 */
 function renderBrandBtns(){
   const btn = (v, label, n) => `<button class="bq-btn" type="button" data-jump="${esc(v)}" aria-pressed="false">${esc(label)}<small>${n}</small></button>`;
-  $("bqRow").innerHTML = btn("all", "전체", CAKES.length) + brandOrder.map(b => btn(b, b, CAKES.filter(c => c.b === b).length)).join("");
+  $("bqRow").innerHTML = btn("all", "전체", CAKES.length) + brandAbc.map(b => btn(b, b, CAKES.filter(c => c.b === b).length)).join("");
 }
 
 /* 가격 표기 */
@@ -549,7 +552,7 @@ function renderChips(){
   /* 본문 3칸은 폭이 좁아 개수 없이, 필터 시트는 개수 포함 */
   const th = n => THEMES.map(([id, label, fn]) =>
     `<option value="${esc(id)}">${id === "all" ? "테마 전체" : esc(label) + (n ? ` (${CAKES.filter(fn).length})` : "")}</option>`).join("");
-  const br = n => `<option value="all">브랜드 전체</option>` + brandOrder.map(b =>
+  const br = n => `<option value="all">브랜드 전체</option>` + brandAbc.map(b =>
     `<option value="${esc(b)}">${esc(b)}${n ? ` (${CAKES.filter(c => c.b === b).length})` : ""}</option>`).join("");
   [["themeSel", 0], ["fsTheme", 1]].forEach(([id, n]) => { $(id).innerHTML = th(n); $(id).value = st.theme; $(id).classList.toggle("on", st.theme !== "all"); });
   [["brandSel", 0], ["fsBrand", 1]].forEach(([id, n]) => { $(id).innerHTML = br(n); $(id).value = st.brand; $(id).classList.toggle("on", st.brand !== "all"); });
